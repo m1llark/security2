@@ -6,29 +6,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.repository.RoleRepository;
+import ru.kata.spring.boot_security.demo.repository.UserRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
 @Component
 public class MyValidator implements Validator {
-    private final UserService userService;
-
     @Autowired
-    public MyValidator(UserService userService) {
-        this.userService = userService;
-    }
-
+    private UserRepository userRepository;
     @Override
     public boolean supports(Class<?> clazz) {
         return User.class.equals(clazz);
     }
-
     @Override
     public void validate(Object target, Errors errors) {
         User user = (User) target;
-        try {
-            userService.loadUserByUsername(user.getUsername());
-        } catch (UsernameNotFoundException exception) {
-             return;
+        if (userRepository.findByUsername(user.getUsername()) == null) {
+
+        } else {
+            if (userRepository.findByUsername(user.getUsername()).getId().equals(user.getId())) {
+
+            } else {
+                errors.rejectValue("username", "", "User exist");
+            }
         }
-        errors.rejectValue("username", "" , "User exist");
     }
 }

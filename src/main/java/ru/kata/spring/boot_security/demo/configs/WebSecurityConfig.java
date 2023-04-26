@@ -23,42 +23,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SuccessUserHandler successUserHandler;
 
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
 
-
-
-
-//    @Bean
-//    public PasswordEncoder getPasswordencoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
-
-
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http.authorizeRequests()
-//                .antMatchers("/admin").hasRole("ADMIN")
-//                .antMatchers("/auth/login","/auth/registration", "/error").permitAll()
-//                .anyRequest().hasAnyRole("USER","ADMIN")
-//                .and()
-//                .formLogin().loginPage("/auth/login")
-//                .loginProcessingUrl("/process_login")
-//                .defaultSuccessUrl("/hello", true)
-//                .failureUrl("/auth/login?error")
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/auth/login");
-//    }
-
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-//                .antMatchers("/admin/login","/admin/registration", "/error").permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/user").hasAnyRole("ADMIN","USER")
+                .antMatchers("/registration").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(successUserHandler)
                 .permitAll()

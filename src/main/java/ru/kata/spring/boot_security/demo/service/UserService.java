@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
 import java.util.Collections;
@@ -24,64 +25,33 @@ import java.util.Set;
 
 @Transactional
 @Service
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService {
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
-
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
-
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return userRepository.findByUsername(username).get();
-    }
-
-
-    public User loadUserById(Long id) {
-//        Optional<User> user = userRepository.findById(userId);
-//        return user.orElse(null);
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        return user;
-    }
 
     public List<User> listUsers() {
         return userRepository.findAll();
     }
 
-
-//    public void register(User user) {
-//        if (user.getUsername().equals("admin")) {
-//            user.setRoles(Set.of(new Role("ROLE_ADMIN"),(new Role("ROLE_USER"))));
-//        }
-//        else {
-//            user.setRoles(Collections.singleton(new Role("ROLE_USER")));
-//
-//        }
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        userRepository.save(user);
-//    }
-    public void register(User user) {
-        if (user.getUsername().equals("admin")) {
-            user.setRoles(Set.of(new Role("ROLE_ADMIN"),(new Role("ROLE_USER"))));
-        }
-
-        else {
-            user.setRoles(Collections.singleton(new Role("ROLE_USER")));
-
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username);
     }
 
+    public User get(Long id) {
+        return userRepository.findById(id).get();
+    }
+
+    public List<Role> listRoles() {
+        if (roleRepository.findAll().isEmpty()) {
+            roleRepository.save(new Role("ROLE_USER"));
+            roleRepository.save(new Role("ROLE_ADMIN"));
+        }
+        return roleRepository.findAll();
+    }
     public boolean removeUserById(Long userId) {
         if (userRepository.findById(userId).isPresent()) {
             userRepository.deleteById(userId);
@@ -89,5 +59,16 @@ public class UserService implements UserDetailsService{
         }
         return false;
     }
+    public boolean saveUser(User user) {
+        User userFromDB = userRepository.findByUsername(user.getUsername());
+
+        if ((userRepository.findByUsername(user.getUsername()) != null)) {
+            return false;
+        }
+        userRepository.save(user);
+        return true;
+    }
+
 
 }
+
