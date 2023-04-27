@@ -26,11 +26,17 @@ import java.util.Set;
 @Transactional
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
-    private RoleRepository roleRepository;
+
+    private final RoleRepository roleRepository;
+
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
+
 
     public List<User> listUsers() {
         return userRepository.findAll();
@@ -38,13 +44,11 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);
+        return user;
     }
 
-    public User get(Long id) {
-        return userRepository.findById(id).get();
-    }
-
+    @Transactional
     public List<Role> listRoles() {
         if (roleRepository.findAll().isEmpty()) {
             roleRepository.save(new Role("ROLE_USER"));
@@ -52,6 +56,7 @@ public class UserService implements UserDetailsService {
         }
         return roleRepository.findAll();
     }
+    @Transactional
     public boolean removeUserById(Long userId) {
         if (userRepository.findById(userId).isPresent()) {
             userRepository.deleteById(userId);
@@ -59,16 +64,10 @@ public class UserService implements UserDetailsService {
         }
         return false;
     }
-    public boolean saveUser(User user) {
-        User userFromDB = userRepository.findByUsername(user.getUsername());
 
-        if ((userRepository.findByUsername(user.getUsername()) != null)) {
-            return false;
-        }
+    @Transactional
+    public void saveUser(User user) {
         userRepository.save(user);
-        return true;
     }
-
-
 }
 

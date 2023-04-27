@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+
+    <title>Title</title>
+</head>
+<body>
+
+
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <td th:text="${user.email} + ' with roles: '+ ${user.roles}"></td>
+
+    <!--  <button type="button"  class="btn btn-primary btn-sm pull-right" >Logout</button>-->
+    <a href="/logout" class="btn btn-primary btn-sm pull-right">Logout</a>
+</nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="p-0 col-2">
+            <div class="nav flex-column nav-pills pt-4"  role="tablist" aria-orientation="vertical">
+                <div sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a class="nav-link active" href="/">Admin</a>
+                </div>
+                <div sec:authorize="hasRole('ROLE_USER')">
+                    <a class="nav-link " href="/user">User</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-10">
+            <div class="container-fluid bg-light" >
+                <h2 class="display-4"><p><strong>Admin panel</strong></p></h2>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Users table</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/add">New User</a>
+                    </li>
+                </ul>
+
+                <h5 class="card-header bg-white">Add new user</h5>
+
+
+
+
+
+                <div class="container-fluid h-100 bg-light ">
+                    <div class="row justify-content-center align-items-center">
+                    </div>
+                    <div class="row justify-content-center align-items-center h-100">
+                        <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                            <form th:action="@{/save}" method="post">
+                                <div class="modal-body">
+
+
+                                    <div class="form-group">
+                                        <div class="row h-100 justify-content-center align-items-center">
+                                            <h5><label  class="col-form-label " >Username:</label></h5>
+                                        </div>
+                                        <input type="text" class="form-control"  name="username">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <div class="row h-100 justify-content-center align-items-center">
+                                            <h5><label  class="col-form-label " >E-mail:</label></h5>
+                                        </div>
+                                        <input type="text" class="form-control"  name="email">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row h-100 justify-content-center align-items-center">
+                                            <h5><label  class="col-form-label " >Age:</label></h5>
+                                        </div>
+                                        <input type="text" class="form-control"  name="age">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row h-100 justify-content-center align-items-center">
+                                            <h5><label  class="col-form-label " >Password:</label></h5>
+                                        </div>
+                                        <input type="password" class="form-control"  name="password">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row h-100 justify-content-center align-items-center">
+                                            <h5><label  class="col-form-label " >Role:</label></h5>
+                                        </div>
+                                        <!--                                        <select class="form-select form-select-lg mb-3" size="2" multiple aria-label="multiple select example"  name="roles" >-->
+                                        <!--                                            <option th:each="role: ${listRoles}" th:value="${role.id}" th:text="${role.name}"></option>-->
+                                        <!--                                        </select>-->
+                                    </div>
+
+                                    <div class="row text-center justify-content-center">
+                                        <select id="selectList" size="2" multiple aria-label="multiple select example"  name="roles" style="width: 200px; position: relative; left: 50%; margin-left: -100px; ">
+                                            <option th:each="role: ${listRoles}" th:value="${role.id}" th:text="${role.name}" th:selected="${role.name.equals('ROLE_USER')}"></option>
+                                        </select>
+                                        <hr>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center">
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Add new user</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<td><a th:href="@{/add}">Add New User</a></td>-->
+
+
+
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>

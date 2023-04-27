@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,30 +25,25 @@ import java.util.Collections;
 import java.util.Map;
 
 @Controller
-
 public class RegistrationController {
-    @Autowired
-    private UserRepository userRepository;
+
+
+    private final RoleRepository roleRepository;
+
+    private final UserService userService;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final MyValidator myValidator;
 
     @Autowired
-    private RoleRepository roleRepository;
+    public RegistrationController(RoleRepository roleRepository, UserService userService, PasswordEncoder passwordEncoder, MyValidator myValidator) {
+        this.roleRepository = roleRepository;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.myValidator = myValidator;
+    }
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private MyValidator myValidator;
-
-//    @GetMapping(("/user"))
-//    public String UserInfo(ModelMap model) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user =  (User) authentication.getPrincipal();
-//        model.addAttribute("user", user);
-//        return "user";
-//    }
 
     @GetMapping("/registration")
     public String showSignUpForm(@ModelAttribute("user") User user) {
@@ -68,7 +64,7 @@ public class RegistrationController {
             user.addRole(roleRepository.getById(1L));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        userService.saveUser(user);
         return "redirect:/login";
     }
 }

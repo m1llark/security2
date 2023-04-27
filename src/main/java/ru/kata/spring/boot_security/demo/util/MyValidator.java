@@ -9,10 +9,18 @@ import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
+
+import java.util.Optional;
+
 @Component
 public class MyValidator implements Validator {
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public MyValidator(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Override
     public boolean supports(Class<?> clazz) {
         return User.class.equals(clazz);
@@ -20,10 +28,11 @@ public class MyValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         User user = (User) target;
-        if (userRepository.findByUsername(user.getUsername()) == null) {
+        User user2 = userRepository.findByUsername(user.getUsername()).orElse(null);
+        if (user2 == null) {
 
         } else {
-            if (userRepository.findByUsername(user.getUsername()).getId().equals(user.getId())) {
+            if (user2.getId().equals(user.getId())) {
 
             } else {
                 errors.rejectValue("username", "", "User exist");
