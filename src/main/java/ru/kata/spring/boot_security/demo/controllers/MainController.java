@@ -35,6 +35,8 @@ public class MainController {
         this.passwordEncoder = passwordEncoder;
         this.myValidator = myValidator;
     }
+    //admin admin
+    //user user
 
 
     @RequestMapping(value= {"/"}, method=RequestMethod.GET)
