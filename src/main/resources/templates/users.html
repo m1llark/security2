@@ -82,8 +82,8 @@
             <td th:text="${user.email}">E-mail</td>
             <td th:text="${user.age}">First Name</td>
             <td th:text="${user.roles}">Roles</td>
-            <td><button type="button" style="background-color: darkcyan" class="btn btn-primary" data-toggle="modal" th:data-target="${'#editModal'+ user.id}" ><Edit>Edit</Edit></button></td>
-            <td><button type="button" style="background-color: firebrick" class="btn btn-primary" data-toggle="modal" th:data-target="${'#deleteModal'+ user.id}" >Delete</button></td>
+            <td><button type="button" style="background-color: darkcyan" class="btn btn-secondary" data-toggle="modal" th:data-target="${'#editModal'+ user.id}" ><Edit>Edit</Edit></button></td>
+            <td><button type="button" style="background-color: firebrick" class="btn btn-secondary" data-toggle="modal" th:data-target="${'#deleteModal'+ user.id}" >Delete</button></td>
 
 
 
@@ -155,7 +155,7 @@
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h5 class="modal-title" >Edit user</h5>
+                      <h5 class="modal-title" >Delete user</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>
@@ -196,8 +196,8 @@
                       </div>
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-primary">Delete</button>
+                      <button type="button"  class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="submit" style="background-color: firebrick" class="btn btn-secondary">Delete</button>
                     </div>
                   </div>
                 </div>
