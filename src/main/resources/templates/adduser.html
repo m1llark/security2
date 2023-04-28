@@ -15,11 +15,9 @@
 <body>
 
 
-<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+<nav class="navbar navbar-light" style="background-color: #2b2b2b; color: #e3f2fd" >
     <td th:text="${user.email} + ' with roles: '+ ${user.roles}"></td>
-
-    <!--  <button type="button"  class="btn btn-primary btn-sm pull-right" >Logout</button>-->
-    <a href="/logout" class="btn btn-primary btn-sm pull-right">Logout</a>
+    <a href="/logout" class="type-name-link" style="color: darkgray" >Logout</a>
 </nav>
 
 
@@ -39,10 +37,10 @@
     <div class="row">
         <div class="p-0 col-2">
             <div class="nav flex-column nav-pills pt-4"  role="tablist" aria-orientation="vertical">
-                <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <div sec:authorize="hasAuthority('ADMIN')">
                     <a class="nav-link active" href="/">Admin</a>
                 </div>
-                <div sec:authorize="hasRole('ROLE_USER')">
+                <div sec:authorize="hasAuthority('USER')">
                     <a class="nav-link " href="/user">User</a>
                 </div>
             </div>

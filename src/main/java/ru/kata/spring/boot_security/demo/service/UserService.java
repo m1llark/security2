@@ -51,8 +51,8 @@ public class UserService implements UserDetailsService {
     @Transactional
     public List<Role> listRoles() {
         if (roleRepository.findAll().isEmpty()) {
-            roleRepository.save(new Role("ROLE_USER"));
-            roleRepository.save(new Role("ROLE_ADMIN"));
+            roleRepository.save(new Role("USER"));
+            roleRepository.save(new Role("ADMIN"));
         }
         return roleRepository.findAll();
     }

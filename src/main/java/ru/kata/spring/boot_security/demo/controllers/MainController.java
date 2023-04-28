@@ -55,8 +55,13 @@ public class MainController {
     @PutMapping("/update/{id}")
     public String updateUser(@ModelAttribute("user") User user, Model model) {
         model.addAttribute("listRoles", userService.listRoles());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.saveUser(user);
+        if (userService.loadUserByUsername(user.getUsername()).getPassword().equals(user.getPassword())) {
+            userService.saveUser(user);
+        }
+        else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userService.saveUser(user);
+        }
         return "redirect:/";
     }
 
