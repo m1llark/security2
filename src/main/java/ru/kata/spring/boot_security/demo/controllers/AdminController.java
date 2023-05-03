@@ -6,32 +6,29 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.repository.RoleRepository;
-import ru.kata.spring.boot_security.demo.repository.UserRepository;
-import ru.kata.spring.boot_security.demo.service.UserService;
+import ru.kata.spring.boot_security.demo.service.RoleService;
+import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 import ru.kata.spring.boot_security.demo.util.MyValidator;
 
 import javax.validation.Valid;
-import java.util.*;
 
 
 @Controller
-public class MainController {
+public class AdminController {
 
-    private final RoleRepository roleRepository;
-    private final UserService userService;
+    private final RoleService roleService;
+    private final UserServiceImpl userServiceImpl;
     private final PasswordEncoder passwordEncoder;
     private final MyValidator myValidator;
 
     @Autowired
-    public MainController(UserService userService, RoleRepository roleRepository, PasswordEncoder passwordEncoder, MyValidator myValidator) {
-        this.userService = userService;
-        this.roleRepository = roleRepository;
+    public AdminController(UserServiceImpl userServiceImpl, RoleService roleService, PasswordEncoder passwordEncoder, MyValidator myValidator) {
+        this.userServiceImpl = userServiceImpl;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.myValidator = myValidator;
     }
@@ -39,14 +36,14 @@ public class MainController {
     //user user
 
 
-    @RequestMapping(value= {"/"}, method=RequestMethod.GET)
+    @GetMapping(value= {"/"})
     public ModelAndView getAllUsers() {
         ModelAndView model = new ModelAndView();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user =  (User) authentication.getPrincipal();
         model.addObject("user", user);
-        model.addObject("listUsers", userService.listUsers());
-        model.addObject("listRoles", roleRepository.findAll());
+        model.addObject("listUsers", userServiceImpl.listUsers());
+        model.addObject("listRoles", roleService.listRoles());
         model.setViewName("users");
         return model;
     }
@@ -54,25 +51,25 @@ public class MainController {
 
     @PutMapping("/update/{id}")
     public String updateUser(@ModelAttribute("user") User user, Model model) {
-        model.addAttribute("listRoles", userService.listRoles());
-        if (userService.loadUserByUsername(user.getUsername()).getPassword().equals(user.getPassword())) {
-            userService.saveUser(user);
+        model.addAttribute("listRoles", roleService.listRoles());
+        if (userServiceImpl.loadUserByUsername(user.getUsername()).getPassword().equals(user.getPassword())) {
+            userServiceImpl.updateUser(user);
         }
         else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userService.saveUser(user);
+            userServiceImpl.updateUser(user);
         }
         return "redirect:/";
     }
 
 
-    @RequestMapping(value= {"/add"}, method=RequestMethod.GET)
+    @GetMapping(value= {"/add"})
     public ModelAndView addUser() {
         ModelAndView model = new ModelAndView();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user =  (User) authentication.getPrincipal();
         model.addObject("user", user);
-        model.addObject("listRoles", roleRepository.findAll());
+        model.addObject("listRoles", roleService.listRoles());
         model.setViewName("adduser");
         return model;
     }
@@ -80,7 +77,7 @@ public class MainController {
 
     @PostMapping("/save")
     public String confirmationAddUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
-        model.addAttribute("listRoles", userService.listRoles());
+        model.addAttribute("listRoles", roleService.listRoles());
         myValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             return "adduser";
@@ -88,32 +85,26 @@ public class MainController {
         }
         else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userService.saveUser(user);
+            userServiceImpl.saveUser(user);
             return "redirect:/";
         }
     }
 
 
-    @PostMapping("/addNew")
-    public String addNew(User user) {
-        userService.saveUser(user);
-        return "redirect:/";
-    }
+//    @PostMapping("/addNew")
+//    public String addNew(User user) {
+//        userServiceImpl.saveUser(user);
+//        return "redirect:/";
+//    }
 
 
 
-    @RequestMapping(value="/delete/{id}")
+    @DeleteMapping(value="/delete/{id}")
     public ModelAndView deleteUser(@PathVariable("id") Long id) {
-        userService.removeUserById(id);
+        userServiceImpl.removeUserById(id);
         return new ModelAndView("redirect:/");
     }
 
 
-    @GetMapping(("/user"))
-    public String UserInfo(ModelMap model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user =  (User) authentication.getPrincipal();
-        model.addAttribute("user", user);
-        return "user";
-    }
+
 }
