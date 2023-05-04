@@ -10,8 +10,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.service.RoleServiceImpl;
-import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
+import ru.kata.spring.boot_security.demo.service.RoleService;
+import ru.kata.spring.boot_security.demo.service.UserService;
 import ru.kata.spring.boot_security.demo.util.MyValidator;
 
 import javax.validation.Valid;
@@ -20,15 +20,16 @@ import javax.validation.Valid;
 @Controller
 public class AdminController {
 
-    private final RoleServiceImpl roleServiceImpl;
-    private final UserServiceImpl userServiceImpl;
+    private final RoleService roleService;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final MyValidator myValidator;
 
     @Autowired
-    public AdminController(UserServiceImpl userServiceImpl, RoleServiceImpl roleServiceImpl, PasswordEncoder passwordEncoder, MyValidator myValidator) {
-        this.userServiceImpl = userServiceImpl;
-        this.roleServiceImpl = roleServiceImpl;
+    public AdminController(RoleService roleService, UserService userService, PasswordEncoder passwordEncoder, MyValidator myValidator) {
+        this.roleService = roleService;
+        this.userService = userService;
+
         this.passwordEncoder = passwordEncoder;
         this.myValidator = myValidator;
     }
@@ -42,8 +43,8 @@ public class AdminController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user =  (User) authentication.getPrincipal();
         model.addObject("user", user);
-        model.addObject("listUsers", userServiceImpl.listUsers());
-        model.addObject("listRoles", roleServiceImpl.listRoles());
+        model.addObject("listUsers", userService.listUsers());
+        model.addObject("listRoles", roleService.listRoles());
         model.setViewName("users");
         return model;
     }
@@ -51,13 +52,13 @@ public class AdminController {
 
     @PutMapping("/update/{id}")
     public String updateUser(@ModelAttribute("user") User user, Model model) {
-        model.addAttribute("listRoles", roleServiceImpl.listRoles());
-        if (userServiceImpl.loadUserByUsername(user.getUsername()).getPassword().equals(user.getPassword())) {
-            userServiceImpl.updateUser(user);
+        model.addAttribute("listRoles", roleService.listRoles());
+        if (userService.loadUserByUsername(user.getUsername()).getPassword().equals(user.getPassword())) {
+            userService.updateUser(user);
         }
         else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userServiceImpl.updateUser(user);
+            userService.updateUser(user);
         }
         return "redirect:/";
     }
@@ -69,7 +70,7 @@ public class AdminController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user =  (User) authentication.getPrincipal();
         model.addObject("user", user);
-        model.addObject("listRoles", roleServiceImpl.listRoles());
+        model.addObject("listRoles", roleService.listRoles());
         model.setViewName("adduser");
         return model;
     }
@@ -77,7 +78,7 @@ public class AdminController {
 
     @PostMapping("/save")
     public String confirmationAddUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
-        model.addAttribute("listRoles", roleServiceImpl.listRoles());
+        model.addAttribute("listRoles", roleService.listRoles());
         myValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             return "adduser";
@@ -85,7 +86,7 @@ public class AdminController {
         }
         else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userServiceImpl.saveUser(user);
+            userService.saveUser(user);
             return "redirect:/";
         }
     }
@@ -101,7 +102,7 @@ public class AdminController {
 
     @DeleteMapping(value="/delete/{id}")
     public ModelAndView deleteUser(@PathVariable("id") Long id) {
-        userServiceImpl.removeUserById(id);
+        userService.removeUserById(id);
         return new ModelAndView("redirect:/");
     }
 
